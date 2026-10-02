@@ -134,7 +134,7 @@ GitHub の Web 画面だけでできます。
 3. 中身を書きかえて、**「Commit changes...」→「Commit changes」** を押します。
 
 > 仮の作品(5本)は、次のファイルです。中身をまるごと自分の原稿に書きかえれば差し替え完了です。
-> - `2026-09-10-hoshi-no-sentakuya.md`(童話・長めの文章)
+> - `2026-09-10-kiechae-kiiro.md`(童話。差し替え済み:「消えちゃえ、黄色」)
 > - `2026-09-15-tanuki-no-kasa.md`(民話)
 > - `2026-09-21-kaisatsu.md`(ショートショート、コメディ)
 > - `2026-09-28-ai-no-hirune.md`(AI)
@@ -183,7 +183,7 @@ GitHub の Web 画面だけでできます。
 ### おすすめ作品
 
 ```html
-<li data-recommend="2026-09-10-hoshi-no-sentakuya"></li>
+<li data-recommend="2026-09-10-kiechae-kiiro"></li>
 ```
 
 `data-recommend="…"` の中に、作品ファイル名(`.md` / `.txt` を除いた部分)を書きます。

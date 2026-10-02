@@ -134,7 +134,8 @@
      作品ファイルを読む
      ========================================================= */
   var SEPARATOR = /^[ \t　]*[-ー―—－‐−]{3,}[ \t　]*$/;
-  var LABEL_LINE = /^[ \t　]*([^::]{1,12}?)[ \t　]*[::][ \t　]*(.*)$/;
+  // 先頭に「## 」や「**」が付いてしまった行(メモ帳や編集画面で付くことがある)も項目として読む
+  var LABEL_LINE = /^[ \t　]*(?:[#＃]+[ \t　]*)?(?:\*\*)?([^::*#＃]{1,12}?)(?:\*\*)?[ \t　]*[::][ \t　]*(.*?)(?:\*\*)?[ \t　]*$/;
 
   function parseWork(text, file) {
     var where = CONFIG.worksDir + file;
@@ -240,6 +241,8 @@
   }
 
   function renderBody(body) {
+    // 編集画面などで紛れこむ空白の記号(&#x20; や &nbsp;)は、ふつうの空白として扱う
+    body = body.replace(/&#x20;|&#32;|&nbsp;/gi, ' ');
     // 空行(スペースだけの行も含む)を段落の区切りにする
     var paragraphs = body.replace(/^\s*\n/, '').split(/\n(?:[ \t　]*\n)+/);
     return paragraphs.map(function (p) {
