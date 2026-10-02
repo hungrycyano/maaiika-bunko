@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- 検索エンジンに載せないための設定です。外し方は README.md を見てください。 -->
+  <meta name="robots" content="noindex, nofollow">
+  <title>まあいいか文庫</title>
+  <meta name="description" content="今は解決しないけど、まあいいか〜。鬼巛(きさらぎ せん)の短編小説サイトです。">
+  <meta name="theme-color" content="#eaf5f8">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23d9f0ec'/%3E%3Ccircle cx='24' cy='38' r='6' fill='%23fff'/%3E%3Ccircle cx='38' cy='26' r='8' fill='%23fff'/%3E%3Ccircle cx='42' cy='44' r='4' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&family=Zen+Maru+Gothic:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    // 前回の表示設定(ダークモード・文字サイズ・縦書き)を、画面が出る前に戻します。
+    (function () {
+      try {
+        var d = document.documentElement;
+        var theme = localStorage.getItem('mb-theme');
+        if (!theme && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
+        if (theme) d.setAttribute('data-theme', theme);
+        var size = localStorage.getItem('mb-font-size');
+        if (size) d.style.setProperty('--story-font-size', size + 'px');
+        if (localStorage.getItem('mb-vertical') === '1') d.classList.add('is-vertical');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#story-scroll">本文へ移動</a>
+
+  <div class="layout">
+
+    <!-- ===== タイトル ===== -->
+    <header class="card site-header">
+      <div class="site-header__text">
+        <h1 class="site-title"><a href="./" data-home>まあいいか文庫</a></h1>
+        <p class="site-catch">今は解決しないけど、まあいいか〜</p>
+      </div>
+      <button type="button" class="pill-button theme-toggle" id="theme-toggle" aria-pressed="false">
+        <span class="theme-toggle__icon" aria-hidden="true"></span>
+        <span class="theme-toggle__label">ダークモード</span>
+      </button>
+      <span class="bubbles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+    </header>
+
+    <!-- ===== 作者向けの警告(問題があるときだけ表示されます) ===== -->
+    <section class="card author-warnings" id="author-warnings" hidden aria-live="polite">
+      <div class="author-warnings__head">
+        <h2>作者向けのお知らせ:作品ファイルの書き方を確認してください</h2>
+        <button type="button" class="pill-button" id="author-warnings-close">閉じる</button>
+      </div>
+      <ul id="author-warnings-list"></ul>
+    </section>
+
+    <!-- ===== アイキャッチ(雲のタグ) ===== -->
+    <section class="card eyecatch" aria-labelledby="eyecatch-text">
+      <p class="eyecatch__text" id="eyecatch-text">ふわっと浮かんで、肩の力をぬく。<br class="sp-only">今のきぶんに近い雲を、ひとつどうぞ。</p>
+      <div class="clouds" id="clouds" role="group" aria-label="タグで作品をさがす"></div>
+    </section>
+
+    <!-- ===== 左列:メニュー・おすすめ ===== -->
+    <div class="side">
+
+      <section class="card menu-card" aria-labelledby="guide-h">
+        <h2 class="card-title" id="guide-h"><span class="card-title__dot" aria-hidden="true"></span>案内</h2>
+        <p>個人が運営する短編小説サイトです。</p>
+        <p>炭酸水をひとくち飲むくらいの時間で読める、短いおはなしを置いています。上の雲か、書庫のタグを押すと、作品をしぼりこめます。</p>
+        <p class="small">文字の大きさ・縦書き・ダークモードは、本文の上のボタンで切り替えられます。</p>
+      </section>
+
+      <section class="card menu-card" aria-labelledby="profile-h">
+        <h2 class="card-title" id="profile-h"><span class="card-title__dot" aria-hidden="true"></span>自己紹介</h2>
+        <p class="author-name">鬼巛<span class="author-kana">(きさらぎ せん)</span></p>
+        <p>(ここに自己紹介が入ります。)晴れた日の午後と、少し気の抜けた炭酸が好きです。考えごとはだいたい途中で「まあいいか」となります。</p>
+      </section>
+
+      <section class="card menu-card" aria-labelledby="recommend-h">
+        <h2 class="card-title" id="recommend-h"><span class="card-title__dot" aria-hidden="true"></span>おすすめ作品</h2>
+        <!--
+          おすすめにしたい作品のファイル名(.md や .txt を除いた部分)を data-recommend="" に書きます。
+          作品名と紹介文は自動で表示されます。
+        -->
+        <ul class="recommend-list">
+          <li data-recommend="2026-09-10-hoshi-no-sentakuya"></li>
+          <li data-recommend="2026-09-28-ai-no-hirune"></li>
+        </ul>
+      </section>
+
+      <section class="card menu-card" aria-labelledby="news-h">
+        <h2 class="card-title" id="news-h"><span class="card-title__dot" aria-hidden="true"></span>お知らせ・更新情報</h2>
+        <!-- お知らせは <li> を1つ足すだけで増やせます。 -->
+        <ul class="news-list">
+          <li><time datetime="2026-10-02">2026.10.02</time>サイトをひらきました。のんびり更新していきます。</li>
+        </ul>
+        <p class="news-sub">最近の更新</p>
+        <ul class="news-list" id="recent-list"></ul>
+      </section>
+
+    </div>
+
+    <!-- ===== 中央列:物語の本文 ===== -->
+    <main class="card story-card" id="story-card">
+      <div class="reader-bar" role="toolbar" aria-label="読みやすさの設定">
+        <div class="reader-bar__group" role="group" aria-label="文字の大きさ">
+          <button type="button" class="pill-button" id="font-smaller" aria-label="文字を小さく">文字 小</button>
+          <button type="button" class="pill-button" id="font-larger" aria-label="文字を大きく">文字 大</button>
+        </div>
+        <button type="button" class="pill-button" id="vertical-toggle" aria-pressed="false">縦書きにする</button>
+      </div>
+      <div class="story-scroll" id="story-scroll" tabindex="-1">
+        <div class="story" id="story" aria-live="polite">
+          <p class="loading">読みこみ中です……</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- ===== 右列:書庫 ===== -->
+    <aside class="card library" id="library" aria-labelledby="library-h">
+      <h2 class="card-title" id="library-h"><span class="card-title__dot" aria-hidden="true"></span>書庫</h2>
+      <div class="library-filter" id="library-filter" hidden>
+        <p class="library-filter__name" id="library-filter-name"></p>
+        <p class="library-filter__desc" id="library-filter-desc"></p>
+        <button type="button" class="pill-button" id="library-clear">すべての作品を表示</button>
+      </div>
+      <div class="library-scroll">
+        <ul class="library-list" id="library-list"></ul>
+      </div>
+    </aside>
+
+    <footer class="site-footer">
+      <small>© まあいいか文庫 / 鬼巛(きさらぎ せん)</small>
+    </footer>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
