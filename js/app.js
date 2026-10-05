@@ -546,11 +546,12 @@
   }
 
   // 押したときに、雲を「ぽよん」とはずませる
+  // 「動きを減らす」設定のときは、はずませずに、ふわっと一度ふくらむだけにする
   function boing(cloud) {
-    if (REDUCED_MOTION.matches) return;
-    cloud.classList.remove('is-boing');
-    void cloud.offsetWidth;   // 続けて押しても、もう一度はずむように
-    cloud.classList.add('is-boing');
+    var cls = REDUCED_MOTION.matches ? 'is-pulse' : 'is-boing';
+    cloud.classList.remove('is-boing', 'is-pulse');
+    void cloud.offsetWidth;   // 続けて押しても、もう一度動くように
+    cloud.classList.add(cls);
   }
 
   /* ---------- 左列 ---------- */
@@ -652,7 +653,9 @@
     $('library-clear').addEventListener('click', function () { setFilter(null); });
 
     $('clouds').addEventListener('animationend', function (e) {
-      if (e.animationName === 'cloud-boing') e.target.classList.remove('is-boing');
+      if (e.animationName === 'cloud-boing' || e.animationName === 'cloud-pulse') {
+        e.target.classList.remove('is-boing', 'is-pulse');
+      }
     });
 
     window.addEventListener('popstate', function () {

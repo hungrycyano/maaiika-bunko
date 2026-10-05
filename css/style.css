@@ -318,6 +318,11 @@ button { font: inherit; color: inherit; }
   85%  { scale: 0.99 1.01; }
   100% { scale: 1; }
 }
+@keyframes cloud-pulse {
+  0%   { scale: 1; }
+  45%  { scale: 1.06; }
+  100% { scale: 1; }
+}
 @keyframes puff-pop {
   0%   { transform: scale(1); }
   40%  { transform: scale(1.18); }
@@ -330,6 +335,8 @@ button { font: inherit; color: inherit; }
   .bubbles { display: none; }
   .pill-button, .cloud { transition: none; }
   .cloud:hover, .pill-button:hover { scale: none; transform: none; }
+  /* 揺れは止めるが、押したことが分かるように、その場でふわっと一度だけふくらむ */
+  .cloud.is-pulse { animation: cloud-pulse .45s ease-out !important; }
 }
 
 /* ---------- 左列のカード ---------- */
