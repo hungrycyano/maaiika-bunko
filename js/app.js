@@ -600,21 +600,29 @@
     }
   }
 
+  var revealTimer = null;
+
   function setFilter(tag, opts) {
     opts = opts || {};
     state.filterTag = tag || null;
     renderLibrary();
     updateClouds();
     if (opts.push !== false) updateHistory(true);
+    clearTimeout(revealTimer);
     if (opts.reveal) {
-      var lib = $('library');
-      if (!PC_QUERY.matches) {
-        lib.scrollIntoView({ behavior: REDUCED_MOTION.matches ? 'auto' : 'smooth', block: 'start' });
-      }
-      lib.classList.remove('is-flash');
-      void lib.offsetWidth;
-      lib.classList.add('is-flash');
+      // スマホでは、雲が動き終わるのを少し待ってから書庫へ移動する
+      revealTimer = setTimeout(revealLibrary, PC_QUERY.matches ? 0 : (opts.revealDelay || 0));
     }
+  }
+
+  function revealLibrary() {
+    var lib = $('library');
+    if (!PC_QUERY.matches) {
+      lib.scrollIntoView({ behavior: REDUCED_MOTION.matches ? 'auto' : 'smooth', block: 'start' });
+    }
+    lib.classList.remove('is-flash');
+    void lib.offsetWidth;
+    lib.classList.add('is-flash');
   }
 
   function bindEvents() {
@@ -631,7 +639,10 @@
       if (cloud) {
         var t = cloud.getAttribute('data-tag');
         boing(cloud);
-        setFilter(state.filterTag === t ? null : t, { reveal: state.filterTag !== t });
+        setFilter(state.filterTag === t ? null : t, {
+          reveal: state.filterTag !== t,
+          revealDelay: REDUCED_MOTION.matches ? 450 : 650
+        });
         return;
       }
       var chip = e.target.closest('.tag-chip');

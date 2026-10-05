@@ -287,7 +287,9 @@ button { font: inherit; color: inherit; }
 }
 .cloud__label { position: relative; z-index: 2; display: inline-block; white-space: nowrap; }
 
-.cloud:hover { scale: 1.05; }
+@media (hover: hover) {
+  .cloud:hover { scale: 1.05; }
+}
 .cloud:focus-visible { outline-offset: 6px; border-radius: 999px; }
 
 /* 押したときの「ぽよん」 */
