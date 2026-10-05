@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>図書館からの最後の通信</title>
+  <meta name="description" content="人工衛星が拾った、古い図書館の最後の通信。江戸川乱歩『指環』を読んで、図書館から脱出する短い謎解きゲームです。">
+  <meta name="theme-color" content="#0f1a2b">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230f1a2b'/%3E%3Ccircle cx='32' cy='32' r='11' fill='none' stroke='%23f2c66d' stroke-width='5'/%3E%3Ccircle cx='32' cy='19' r='5' fill='%23bfe6ff'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600&family=Zen+Maru+Gothic:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="stars" aria-hidden="true"></div>
+
+  <header class="top">
+    <a class="back-link" href="../">← まあいいか文庫へ戻る</a>
+    <h1 class="game-title">図書館からの<br class="sp-only">最後の通信</h1>
+    <ol class="progress" id="progress" aria-label="進みぐあい">
+      <li data-step="0">通信</li>
+      <li data-step="1">書棚</li>
+      <li data-step="2">開札口</li>
+      <li data-step="3">脱出</li>
+    </ol>
+  </header>
+
+  <main class="game">
+
+    <!-- 持ち物 -->
+    <section class="inventory" aria-labelledby="inv-h">
+      <h2 id="inv-h">持ち物</h2>
+      <p class="inventory__item" id="inv-item"><span class="inventory__icon" aria-hidden="true">👝</span><span id="inv-name">革の小袋</span><small id="inv-note">腰に下げている。いつから持っていたのか、思い出せない。</small></p>
+    </section>
+
+    <!-- ===== 場面1:衛星からの投稿 ===== -->
+    <section class="scene" id="scene-0" data-scene="0" aria-labelledby="s0-h">
+      <h2 class="scene__title" id="s0-h">場面一 衛星の受信ログ</h2>
+      <p class="lead">夜の観測衛星が、地上のずっと古い周波数から、とぎれとぎれの声を拾った。衛星はそれを、いつものように投稿している。</p>
+
+      <div class="feed" aria-label="衛星の投稿">
+        <div class="feed__profile">
+          <span class="avatar" aria-hidden="true">🛰</span>
+          <div>
+            <p class="feed__name">観測衛星ソラミミ7号</p>
+            <p class="feed__handle">@soramimi_7 ・ 高度 550km</p>
+          </div>
+        </div>
+
+        <article class="post post--pinned">
+          <p class="post__meta"><span class="pin">📌 固定された投稿</span></p>
+          <p class="post__body">わたしは、拾った声を<strong>届いた順に</strong>、ひとつずつ投稿しています。声の主の名前を知りたい人へ。ひとつの投稿につき、<strong>最初のひと文字</strong>だけが、ほんとうの電波です。</p>
+        </article>
+
+        <article class="post">
+          <p class="post__meta"><time datetime="2026-10-01T03:52">10月1日 03:52</time></p>
+          <p class="post__body">らせん階段の奥、書棚のあいだで、信号はとぎれた。これが最後の通信。誰か、出口を見つけて。#受信ログ</p>
+          <p class="post__actions" aria-hidden="true"><span>↻ 12</span><span>♡ 48</span></p>
+        </article>
+        <article class="post">
+          <p class="post__meta"><time datetime="2026-10-01T03:07">10月1日 03:07</time></p>
+          <p class="post__body">ぞっとするほど長いあいだ、同じ言葉をくり返している。「本を読んで、出口をさがして」と。#受信ログ</p>
+          <p class="post__actions" aria-hidden="true"><span>↻ 7</span><span>♡ 31</span></p>
+        </article>
+        <article class="post">
+          <p class="post__meta"><time datetime="2026-10-01T02:31">10月1日 02:31</time></p>
+          <p class="post__body">おそらく、建物の中から。紙とインクのにおいがしそうな、静かな信号だ。#受信ログ</p>
+          <p class="post__actions" aria-hidden="true"><span>↻ 5</span><span>♡ 22</span></p>
+        </article>
+        <article class="post">
+          <p class="post__meta"><time datetime="2026-10-01T02:14">10月1日 02:14</time></p>
+          <p class="post__body">あ、ノイズの奥に、声がある。地上の、ずいぶん古い周波数。#受信ログ</p>
+          <p class="post__actions" aria-hidden="true"><span>↻ 3</span><span>♡ 19</span></p>
+        </article>
+      </div>
+
+      <form class="answer" data-puzzle="library" novalidate>
+        <label for="a-library">声の主は「〇〇〇〇図書館」。〇〇〇〇に入る名前は？</label>
+        <div class="answer__row">
+          <input id="a-library" name="answer" type="text" autocomplete="off" placeholder="ひらがなで">
+          <button type="submit">送信する</button>
+        </div>
+        <p class="hint" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <!-- ===== 場面2:書棚 ===== -->
+    <section class="scene" id="scene-1" data-scene="1" aria-labelledby="s1-h" hidden>
+      <h2 class="scene__title" id="s1-h">場面二 あおぞら図書館の書棚</h2>
+      <p class="lead">名前を呼んだとたん、景色が切りかわった。ほこりっぽい閲覧室。書棚には、背表紙の文字が消えかけた本ばかりが並んでいる。一冊だけ、まだ読める本があった。</p>
+
+      <div class="shelf" aria-label="書棚">
+        <span class="spine spine--blank" aria-hidden="true"></span>
+        <span class="spine spine--blank spine--tall" aria-hidden="true"></span>
+        <button type="button" class="spine spine--book" id="open-book" aria-controls="book" aria-expanded="false"><span>指環</span><small>江戸川乱歩</small></button>
+        <span class="spine spine--blank" aria-hidden="true"></span>
+        <span class="spine spine--blank spine--short" aria-hidden="true"></span>
+        <span class="spine spine--blank" aria-hidden="true"></span>
+      </div>
+      <p class="small center">背表紙を押すと、本がひらきます。</p>
+
+      <article class="book" id="book" hidden aria-labelledby="book-title">
+        <header class="book__head">
+          <h3 id="book-title">指環</h3>
+          <p class="book__author">江戸川乱歩</p>
+        </header>
+        <div class="book__body" id="book-body" tabindex="0" aria-label="『指環』本文">
+          <p class="loading">本をひらいています……</p>
+        </div>
+        <p class="book__note">本文は青空文庫のテキストから、ルビと注記を取り除いて表示しています。出典はページのいちばん下にあります。</p>
+      </article>
+
+      <form class="answer" data-puzzle="hiding" novalidate>
+        <label for="a-hiding">閲覧室の扉に、こう彫られている。「指環が隠されていた場所を答えよ」</label>
+        <div class="answer__row">
+          <input id="a-hiding" name="answer" type="text" autocomplete="off" placeholder="例:〇〇の中">
+          <button type="submit">答える</button>
+        </div>
+        <p class="hint" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <!-- ===== 場面3:開札口 ===== -->
+    <section class="scene" id="scene-2" data-scene="2" aria-labelledby="s2-h" hidden>
+      <h2 class="scene__title" id="s2-h">場面三 開札口</h2>
+      <p class="lead">扉の向こうは、なぜか古い駅の構内だった。改札ではなく、<strong>開札口</strong>と書かれた札。鉄の柵には、四けたの数字をあわせる錠がかかっている。錠の横に、色あせた貼り紙がある。</p>
+
+      <div class="notice">
+        <p class="notice__title">開札口の暗証番号</p>
+        <p class="small">『指環』の本文を読めば、四つの数がわかる。上から順に並べること。(本はもう一度ひらけます)</p>
+        <ol class="notice__list">
+          <li>興奮した人たちがドヤドヤと入ってきたのは、<strong>何等車</strong>の方から？</li>
+          <li>Ｂが窓から投げた蜜柑は、<strong>いくつ</strong>？</li>
+          <li>Ｂの<strong>最後のセリフ</strong>で、笑い声の「ハ」は<strong>いくつ</strong>並んでいる？</li>
+          <li>車掌は「□の中から耳の穴まで」検べた。□に入る漢字の<strong>画数</strong>は？ (この札の「開札口」にも、同じ字がある)</li>
+        </ol>
+      </div>
+      <p class="center"><button type="button" class="ghost-button" id="reopen-book">『指環』をもう一度ひらく</button></p>
+
+      <form class="answer answer--code" data-puzzle="code" novalidate>
+        <label for="a-code">四けたの暗証番号</label>
+        <div class="answer__row">
+          <input id="a-code" name="answer" type="text" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="0000">
+          <button type="submit">錠をまわす</button>
+        </div>
+        <p class="hint" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <!-- ===== 場面4:脱出 ===== -->
+    <section class="scene" id="scene-3" data-scene="3" aria-labelledby="s3-h" hidden>
+      <h2 class="scene__title" id="s3-h">場面四 開札口を出る</h2>
+      <p class="lead">カチリ、と錠がはずれた。柵を押して、開札口を出る。その瞬間、腰に下げた煙草入れが、さっきより少しだけ重くなった気がした。</p>
+      <p class="center"><button type="button" class="big-button" id="open-pouch">煙草入れの底をさぐる</button></p>
+
+      <div class="ending" id="ending" hidden>
+        <div class="ring" aria-hidden="true"><span class="ring__band"></span><span class="ring__stone"></span></div>
+        <p class="ending__title">ダイヤの指環が出てきた。</p>
+        <p>あの汽車の男が、こっそり「しのばせて置いた」場所。開札口を出るときに取り戻されるはずだった指環は、なぜか、まだここにある。</p>
+        <p>見上げると、夜空のどこかで、小さな衛星が光った。</p>
+        <p class="escaped">脱出成功</p>
+        <p class="satellite-post"><span aria-hidden="true">🛰</span> @soramimi_7「あおぞら図書館からの通信、終了。出口は見つかったみたい。おやすみなさい。」</p>
+        <p class="center"><button type="button" class="ghost-button" id="restart">はじめから遊ぶ</button> <a class="ghost-button" href="../">まあいいか文庫へ戻る</a></p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="credits">
+    <h2>作品の出典(青空文庫)</h2>
+    <p>このゲームで読める本文は、青空文庫で公開されている、江戸川乱歩「指環」です。表示のため、ルビと入力者注を取り除いています。</p>
+    <dl>
+      <dt>底本</dt><dd>「江戸川乱歩全集 第1巻 屋根裏の散歩者」光文社文庫、光文社<br>2004(平成16)年7月20日初版1刷発行<br>2012(平成24)年8月15日7刷発行</dd>
+      <dt>底本の親本</dt><dd>「江戸川乱歩全集 第九巻」平凡社<br>1932(昭和7)年3月発行</dd>
+      <dt>初出</dt><dd>「新青年」博文館<br>1925(大正14)年7月<br>※初出時の表題は「小品二篇 その二 指環」です。</dd>
+      <dt>入力</dt><dd>門田裕志</dd>
+      <dt>校正</dt><dd>A.K</dd>
+      <dt>作成</dt><dd>2016年3月4日作成 / 青空文庫作成ファイル</dd>
+    </dl>
+    <p>このファイルは、インターネットの図書館、青空文庫(<a href="https://www.aozora.gr.jp/">https://www.aozora.gr.jp/</a>)で作られました。入力、校正、制作にあたったのは、ボランティアの皆さんです。</p>
+    <p class="small">ゲームの文章・謎:まあいいか文庫 / 鬼巛(きさらぎ せん)</p>
+  </footer>
+
+  <script src="text.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
