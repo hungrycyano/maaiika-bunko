@@ -461,15 +461,13 @@
   }
 
   /* ---------- 雲のタグ(ページを開くたびに一度だけランダムに作る) ---------- */
-  function radiusPart() { return Math.round(rand(38, 62)) + '%'; }
-
   function renderClouds() {
     var box = $('clouds');
     var tags = shuffle(state.tags);
     var colors = ['var(--cloud-1)', 'var(--cloud-2)', 'var(--cloud-3)', 'var(--cloud-4)'];
     box.innerHTML = '';
 
-    tags.forEach(function (tag, i) {
+    tags.forEach(function (tag) {
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'cloud';
@@ -479,30 +477,65 @@
       b.setAttribute('aria-label', tag.name + ':' + tag.desc);
 
       var scale = rand(0.9, 1.12);             // 大きさ
-      var padX = rand(18, 28) * scale;
-      var padTop = rand(12, 18) * scale;
-      var padBottom = rand(9, 13) * scale;
-      var bumpA = rand(24, 36) * scale;
-      var bumpB = rand(30, 46) * scale;
+      var fontPx = 16 * scale * 1.02;
+      var padX = rand(22, 32) * scale;
+      var padTop = rand(12, 16) * scale;
+      var padBottom = rand(9, 12) * scale;
+      var baseH = fontPx * 1.4 + padTop + padBottom;   // 底の部分の高さ(だいたい)
       var offset = rand(0, 14);                 // 上下の位置ずれ
 
       var s = b.style;
-      s.setProperty('--cloud-bg', colors[Math.floor(Math.random() * colors.length)]);
-      s.setProperty('--shape', [radiusPart(), radiusPart(), radiusPart(), radiusPart()].join(' ') + ' / ' +
-        [radiusPart(), radiusPart(), radiusPart(), radiusPart()].join(' '));
-      s.setProperty('--rot', rand(-3.5, 3.5).toFixed(1) + 'deg');   // 傾き(文字が読める程度に小さく)
-      s.setProperty('--bump-a', bumpA.toFixed(0) + 'px');
-      s.setProperty('--bump-a-x', rand(8, 26).toFixed(0) + '%');
-      s.setProperty('--bump-b', bumpB.toFixed(0) + 'px');
-      s.setProperty('--bump-b-x', rand(40, 58).toFixed(0) + '%');
+      s.setProperty('--tint', colors[Math.floor(Math.random() * colors.length)]);
+      s.setProperty('--rot', rand(-3, 3).toFixed(1) + 'deg');   // 傾き(文字が読める程度に小さく)
       s.setProperty('--dur', rand(5, 9).toFixed(1) + 's');
       s.setProperty('--delay', (-rand(0, 8)).toFixed(1) + 's');
       s.setProperty('--lift', (-rand(4, 7)).toFixed(1) + 'px');
-      s.fontSize = (scale * 1.02).toFixed(2) + 'rem';
+      s.fontSize = fontPx.toFixed(1) + 'px';
       s.padding = padTop.toFixed(0) + 'px ' + padX.toFixed(0) + 'px ' + padBottom.toFixed(0) + 'px';
+
+      // 入道雲の頭:まんなかほど大きく盛り上がる丸を、文字数に合わせて3〜5個
+      var count = Math.max(3, Math.min(5, 2 + Math.ceil(tag.name.length / 2)));
+      var puffs = document.createElement('span');
+      puffs.className = 'cloud__puffs';
+      puffs.setAttribute('aria-hidden', 'true');
+      var top = 0;
+      for (var i = 0; i < count; i++) {
+        var t = count === 1 ? 0.5 : i / (count - 1);           // 0(左端)〜1(右端)
+        var center = 1 - Math.abs(t - 0.5) * 2;                // まんなかほど 1
+        var size = baseH * (0.72 + (count > 3 ? 0.5 : 0.36) * center * rand(0.75, 1.1));
+        var bottom = baseH * rand(0.28, 0.42);
+        var x = 16 + t * 68 + rand(-5, 5);
+        var p = document.createElement('i');
+        p.style.setProperty('--s', size.toFixed(0) + 'px');
+        p.style.setProperty('--b', bottom.toFixed(0) + 'px');
+        p.style.setProperty('--x', x.toFixed(0) + '%');
+        p.style.setProperty('--pd', rand(3, 5.5).toFixed(1) + 's');
+        p.style.setProperty('--pdl', (-rand(0, 5)).toFixed(1) + 's');
+        p.style.setProperty('--pop-delay', (i * 0.05).toFixed(2) + 's');
+        puffs.appendChild(p);
+        top = Math.max(top, size * 1.2 + bottom - baseH);    // ふくらんだときの高さも考える
+      }
+      // 両はしの、低くて小さなもこもこ(横から見たときの丸み)
+      [[7, -1], [93, 1]].forEach(function (side, k) {
+        var size = baseH * rand(0.55, 0.68);
+        var p = document.createElement('i');
+        p.style.setProperty('--s', size.toFixed(0) + 'px');
+        p.style.setProperty('--b', (baseH * rand(0.08, 0.16)).toFixed(0) + 'px');
+        p.style.setProperty('--x', (side[0] + side[1] * rand(0, 3)).toFixed(0) + '%');
+        p.style.setProperty('--pd', rand(3, 5.5).toFixed(1) + 's');
+        p.style.setProperty('--pdl', (-rand(0, 5)).toFixed(1) + 's');
+        p.style.setProperty('--pop-delay', (k * 0.2).toFixed(2) + 's');
+        puffs.appendChild(p);
+      });
+      b.appendChild(puffs);
+
+      var base = document.createElement('span');
+      base.className = 'cloud__base';
+      base.setAttribute('aria-hidden', 'true');
+      b.appendChild(base);
+
       // もこもこが上にはみ出す分と揺れる分を、余白で確保して重ならないようにする
-      var headroom = Math.max(bumpA, bumpB) * 0.45 + 6;
-      s.margin = (headroom + offset).toFixed(0) + 'px ' + rand(6, 18).toFixed(0) + 'px ' + (14 - offset + 8).toFixed(0) + 'px';
+      s.margin = (top + 8 + offset).toFixed(0) + 'px ' + rand(16, 26).toFixed(0) + 'px ' + (14 - offset + 10).toFixed(0) + 'px';
 
       var label = document.createElement('span');
       label.className = 'cloud__label';
@@ -510,6 +543,14 @@
       b.appendChild(label);
       box.appendChild(b);
     });
+  }
+
+  // 押したときに、雲を「ぽよん」とはずませる
+  function boing(cloud) {
+    if (REDUCED_MOTION.matches) return;
+    cloud.classList.remove('is-boing');
+    void cloud.offsetWidth;   // 続けて押しても、もう一度はずむように
+    cloud.classList.add('is-boing');
   }
 
   /* ---------- 左列 ---------- */
@@ -588,6 +629,7 @@
       var cloud = e.target.closest('.cloud');
       if (cloud) {
         var t = cloud.getAttribute('data-tag');
+        boing(cloud);
         setFilter(state.filterTag === t ? null : t, { reveal: state.filterTag !== t });
         return;
       }
@@ -608,6 +650,10 @@
     });
 
     $('library-clear').addEventListener('click', function () { setFilter(null); });
+
+    $('clouds').addEventListener('animationend', function (e) {
+      if (e.animationName === 'cloud-boing') e.target.classList.remove('is-boing');
+    });
 
     window.addEventListener('popstate', function () {
       var u = readUrl();

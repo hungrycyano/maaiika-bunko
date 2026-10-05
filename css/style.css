@@ -30,7 +30,9 @@
   --cloud-4: #eef6ff;
   --cloud-text: #2f5566;
   --cloud-active: #bfe3f2;
-  --cloud-shadow: rgba(70, 130, 160, 0.28);
+  --cloud-shadow: rgba(90, 150, 185, 0.22);
+  --cloud-glow: rgba(255, 255, 255, 0.9);    /* 雲のふくらみの、光が当たる部分 */
+  --cloud-shade: rgba(120, 170, 200, 0.14);  /* 雲の底の、ほんのり影になる部分 */
 
   /* 文字・大きさの設定 */
   --font-ui: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
@@ -64,7 +66,9 @@
   --cloud-4: #2b3448;
   --cloud-text: #d7ebf3;
   --cloud-active: #35627a;
-  --cloud-shadow: rgba(0, 0, 0, 0.55);
+  --cloud-shadow: rgba(0, 0, 0, 0.45);
+  --cloud-glow: rgba(255, 255, 255, 0.08);
+  --cloud-shade: rgba(0, 0, 0, 0.18);
   color-scheme: dark;
 }
 
@@ -234,46 +238,95 @@ button { font: inherit; color: inherit; }
   padding: 6px 0 4px;
 }
 
-/* 雲ひとつ分。形・大きさ・傾き・位置は JavaScript がランダムに決めます */
+/* 雲ひとつ分。もこもこの数・大きさ・傾き・位置は JavaScript がランダムに決めます
+   ・cloud__puffs … 上にもくもく盛り上がる丸(入道雲の頭)
+   ・cloud__base  … 底の、平たくて横長の部分
+   ・cloud__label … 文字 */
 .cloud {
-  --bump-a: 30px; --bump-a-x: 18%;
-  --bump-b: 38px; --bump-b-x: 52%;
+  --fill: var(--tint, var(--cloud-1));
   --rot: 0deg; --dur: 7s; --delay: 0s; --lift: -5px;
   position: relative;
-  min-width: 88px; min-height: 50px;
-  padding: 12px 24px 10px;
-  border: 0; cursor: pointer;
-  background: var(--cloud-bg, var(--cloud-1));
+  min-width: 116px; min-height: 48px;
+  padding: 12px 26px 10px;
+  border: 0; background: transparent; cursor: pointer;
   color: var(--cloud-text);
-  border-radius: var(--shape, 50% 50% 46% 54% / 60% 58% 42% 40%);
   font-size: 1rem; font-weight: 700; letter-spacing: 0.08em; line-height: 1.4;
-  filter: drop-shadow(0 6px 8px var(--cloud-shadow));
+  /* やわらかく、ふんわり浮いて見える影 */
+  filter: drop-shadow(0 10px 12px var(--cloud-shadow)) drop-shadow(0 0 1px var(--cloud-shadow));
   rotate: var(--rot);
   animation: cloud-float var(--dur) ease-in-out var(--delay) infinite alternate;
-  transition: background-color .25s, scale .25s;
+  transition: scale .3s ease;
   -webkit-tap-highlight-color: transparent;
 }
-/* 雲の上のもこもこ */
-.cloud::before, .cloud::after {
-  content: ""; position: absolute; z-index: -1; border-radius: 50%;
-  background: inherit;
-  bottom: 40%;
+.cloud[aria-pressed="true"] { --fill: var(--cloud-active); }
+
+.cloud__base, .cloud__puffs i {
+  position: absolute;
+  background:
+    radial-gradient(circle at 42% 30%, var(--cloud-glow) 0%, transparent 60%),
+    var(--fill);
+  transition: background-color .3s;
 }
-.cloud::before { width: var(--bump-a); height: var(--bump-a); left: var(--bump-a-x); }
-.cloud::after  { width: var(--bump-b); height: var(--bump-b); left: var(--bump-b-x); }
-.cloud__label { position: relative; z-index: 1; display: inline-block; white-space: nowrap; }
+.cloud__base {
+  inset: 0; z-index: 1;
+  border-radius: 999px;
+  background:
+    radial-gradient(90% 80% at 50% 10%, var(--cloud-glow) 0%, transparent 70%),
+    linear-gradient(to bottom, transparent 50%, var(--cloud-shade) 100%),
+    var(--fill);
+}
+.cloud__puffs i {
+  z-index: 0;
+  width: var(--s); height: var(--s);
+  left: var(--x); bottom: var(--b);
+  translate: -50% 0;
+  border-radius: 50%;
+  transform-origin: 50% 100%;
+  /* ゆっくり、ふくらんだり、しぼんだり */
+  animation: puff-breathe var(--pd, 4s) ease-in-out var(--pdl, 0s) infinite alternate;
+}
+.cloud__label { position: relative; z-index: 2; display: inline-block; white-space: nowrap; }
+
 .cloud:hover { scale: 1.05; }
-.cloud[aria-pressed="true"] { background: var(--cloud-active); }
-.cloud:focus-visible { outline-offset: 6px; border-radius: 26px; }
+.cloud:focus-visible { outline-offset: 6px; border-radius: 999px; }
+
+/* 押したときの「ぽよん」 */
+.cloud.is-boing {
+  animation:
+    cloud-float var(--dur) ease-in-out var(--delay) infinite alternate,
+    cloud-boing .7s ease-out;
+}
+.cloud.is-boing .cloud__puffs i {
+  animation:
+    puff-breathe var(--pd, 4s) ease-in-out var(--pdl, 0s) infinite alternate,
+    puff-pop .6s ease-out var(--pop-delay, 0s);
+}
 
 @keyframes cloud-float {
   from { translate: 0 0; }
   to   { translate: 0 var(--lift); }
 }
+@keyframes puff-breathe {
+  from { scale: 1; }
+  to   { scale: 1.07; }
+}
+@keyframes cloud-boing {
+  0%   { scale: 1; }
+  20%  { scale: 1.1 0.9; }
+  45%  { scale: 0.95 1.07; }
+  65%  { scale: 1.03 0.98; }
+  85%  { scale: 0.99 1.01; }
+  100% { scale: 1; }
+}
+@keyframes puff-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
 
 /* 端末で「動きを減らす」設定のときは揺らさない */
 @media (prefers-reduced-motion: reduce) {
-  .cloud, .bubbles i { animation: none !important; }
+  .cloud, .cloud.is-boing, .cloud__puffs i, .cloud.is-boing .cloud__puffs i, .bubbles i { animation: none !important; }
   .bubbles { display: none; }
   .pill-button, .cloud { transition: none; }
   .cloud:hover, .pill-button:hover { scale: none; transform: none; }
