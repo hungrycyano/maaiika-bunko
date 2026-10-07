@@ -615,7 +615,7 @@
     }
   }
 
-  // PCでは、雲を押したとき・書庫で作品を選んだときに雲を隠し、本文を縦いっぱいに広げる
+  // PCでは、雲を押したとき・作品を開いたとき(書庫・おすすめ・前後の作品など)に雲を隠し、本文を縦いっぱいに広げる
   // (スマホでは何もしません。再読み込みすると、雲はまた表示されます)
   var hideCloudsTimer = null;
 
@@ -645,7 +645,7 @@
         // 修飾キー付きのクリック(新しいタブで開くなど)はブラウザにまかせる
         if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
         e.preventDefault();
-        if (link.closest('#library')) hideClouds();
+        hideClouds();
         showWork(link.getAttribute('data-work'), { focus: true });
         return;
       }
