@@ -615,6 +615,19 @@
     }
   }
 
+  // PCでは、雲を押したとき・書庫で作品を選んだときに雲を隠し、本文を縦いっぱいに広げる
+  // (スマホでは何もしません。再読み込みすると、雲はまた表示されます)
+  var hideCloudsTimer = null;
+
+  function hideClouds(delay) {
+    if (!PC_QUERY.matches) return;
+    clearTimeout(hideCloudsTimer);
+    hideCloudsTimer = setTimeout(function () {
+      if (!PC_QUERY.matches) return;
+      document.querySelector('.layout').classList.add('is-clouds-hidden');
+    }, delay || 0);
+  }
+
   function revealLibrary() {
     var lib = $('library');
     if (!PC_QUERY.matches) {
@@ -632,6 +645,7 @@
         // 修飾キー付きのクリック(新しいタブで開くなど)はブラウザにまかせる
         if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
         e.preventDefault();
+        if (link.closest('#library')) hideClouds();
         showWork(link.getAttribute('data-work'), { focus: true });
         return;
       }
@@ -643,6 +657,8 @@
           reveal: state.filterTag !== t,
           revealDelay: REDUCED_MOTION.matches ? 450 : 650
         });
+        // 雲が「ぽよん」と動き終わってから隠す
+        hideClouds(REDUCED_MOTION.matches ? 450 : 650);
         return;
       }
       var chip = e.target.closest('.tag-chip');

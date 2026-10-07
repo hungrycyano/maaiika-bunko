@@ -186,6 +186,16 @@ button { font: inherit; color: inherit; }
   .site-header { padding: 16px 28px; }
   .reader-bar { padding: 8px 16px; }
   .reader-bar .pill-button { min-height: 36px; }
+
+  /* 雲を押した・書庫で作品を選んだあとは、雲を隠して、本文を縦いっぱいに広げる */
+  .layout.is-clouds-hidden {
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "header header header"
+      "menu   story  lib"
+      "footer footer footer";
+  }
+  .layout.is-clouds-hidden .eyecatch { display: none; }
 }
 
 /* ---------- タイトル ---------- */
