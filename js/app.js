@@ -644,7 +644,8 @@
     opts = opts || {};
     state.filterTag = tag || null;
     // 絞り込んだ一覧のいちばん上(いちばん新しい作品)を本文に出す。該当がなければメッセージを出す
-    var id = firstWorkId(state.filterTag);
+    // (本文の中のタグを押したときは、読んでいる作品をそのまま表示しておく)
+    var id = opts.keepStory ? state.currentId : firstWorkId(state.filterTag);
     if (id !== state.currentId || !id) {
       state.currentId = id;
       renderStory();
@@ -707,7 +708,7 @@
       }
       var chip = e.target.closest('.tag-chip');
       if (chip) {
-        setFilter(chip.getAttribute('data-tag'), { reveal: true });
+        setFilter(chip.getAttribute('data-tag'), { reveal: true, keepStory: !!chip.closest('#story') });
         return;
       }
       if (e.target.closest('[data-home]')) {
