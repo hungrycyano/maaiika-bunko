@@ -469,6 +469,37 @@ button { font: inherit; color: inherit; }
 .library { display: flex; flex-direction: column; }
 .library-scroll { min-height: 0; flex: 1 1 auto; overflow-y: auto; margin: 0 -10px; padding: 0 10px 4px; scrollbar-width: thin; }
 
+/* 見出しと、タグのプルダウン(入らないときは見出しの下に回ります) */
+.library-head {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 8px 12px; margin: 0 0 12px;
+}
+.library-head .card-title { margin: 0; }
+.tag-select { position: relative; display: inline-flex; flex: 0 1 auto; min-width: 0; }
+.tag-select select {
+  -webkit-appearance: none; appearance: none;
+  min-height: 40px; max-width: 100%; padding: 6px 38px 6px 16px;
+  border: 1px solid transparent; border-radius: 999px;
+  background: var(--accent-soft); color: var(--accent);
+  font-family: inherit; font-size: 0.9rem; font-weight: 500; cursor: pointer;
+  text-overflow: ellipsis;
+}
+.tag-select select option { background: var(--card); color: var(--text); }
+.tag-select::after {
+  content: "▼"; position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+  font-size: 0.62rem; color: var(--accent); pointer-events: none;
+}
+.tag-select select:hover { border-color: var(--line); }
+.tag-select select:focus-visible { border-radius: 999px; }
+/* スマホで選んだときに画面が拡大されないよう、文字は16px以上にする */
+@media (max-width: 1023.98px) {
+  .tag-select select { font-size: 16px; min-height: 44px; }
+}
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
 .library-filter {
   margin: 0 0 12px; padding: 14px 16px; border-radius: 16px;
   background: linear-gradient(135deg, var(--accent-soft), var(--accent-green-soft));

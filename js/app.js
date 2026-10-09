@@ -319,6 +319,17 @@
     });
   }
 
+  // タグで絞り込んだ作品(新しい順)。タグがないときは全作品
+  function worksForTag(tag) {
+    return tag ? state.works.filter(function (w) { return w.tags.indexOf(tag) !== -1; }) : state.works;
+  }
+
+  // タグを選んだときに本文に出す作品(絞り込んだ一覧のいちばん上=いちばん新しい作品)
+  function firstWorkId(tag) {
+    var list = worksForTag(tag);
+    return list[0] ? list[0].id : null;
+  }
+
   /* =========================================================
      URL(作品ごとの固有URL: ?work=ファイル名  タグ: ?tag=タグ名)
      ========================================================= */
@@ -361,7 +372,11 @@
     var work = state.byId[state.currentId];
 
     if (!work) {
-      el.innerHTML = '<p class="story-message">まだ作品がありません。</p>';
+      el.innerHTML = state.works.length && state.filterTag
+        ? '<p class="story-message">タグ「' + escapeHtml(state.filterTag) + '」に該当する小説がありません。<br>書庫の上のプルダウンで、ほかのタグか「全作品」を選んでください。</p>'
+        : '<p class="story-message">まだ作品がありません。</p>';
+      document.title = CONFIG.siteName;
+      resetStoryScroll();
       return;
     }
 
@@ -411,7 +426,8 @@
   function renderLibrary() {
     var list = $('library-list');
     var tag = state.filterTag;
-    var works = tag ? state.works.filter(function (w) { return w.tags.indexOf(tag) !== -1; }) : state.works;
+    var works = worksForTag(tag);
+    syncTagSelect();
 
     var filterBox = $('library-filter');
     if (tag) {
@@ -443,6 +459,28 @@
         '</div>' +
       '</li>';
     }).join('');
+  }
+
+  /* ---------- 書庫のタグのプルダウン ---------- */
+  function renderTagSelect() {
+    var sel = $('library-tag-select');
+    sel.innerHTML = '<option value="">全作品</option>' + state.tags.map(function (t) {
+      return '<option value="' + escapeHtml(t.name) + '">' + escapeHtml(t.name) + '</option>';
+    }).join('');
+    syncTagSelect();
+  }
+
+  function syncTagSelect() {
+    var sel = $('library-tag-select');
+    var tag = state.filterTag || '';
+    // 設定ファイルにないタグ(URLで指定されたときなど)も、選ばれていることが分かるようにする
+    if (tag && !state.tagMap[tag] && !sel.querySelector('option[value="' + CSS.escape(tag) + '"]')) {
+      var o = document.createElement('option');
+      o.value = tag;
+      o.textContent = tag;
+      sel.appendChild(o);
+    }
+    sel.value = tag;
   }
 
   function updateCurrentMarks() {
@@ -605,6 +643,13 @@
   function setFilter(tag, opts) {
     opts = opts || {};
     state.filterTag = tag || null;
+    // 絞り込んだ一覧のいちばん上(いちばん新しい作品)を本文に出す。該当がなければメッセージを出す
+    // (本文の中のタグを押したときは、読んでいる作品をそのまま表示しておく)
+    var id = opts.keepStory ? state.currentId : firstWorkId(state.filterTag);
+    if (id !== state.currentId || !id) {
+      state.currentId = id;
+      renderStory();
+    }
     renderLibrary();
     updateClouds();
     if (opts.push !== false) updateHistory(true);
@@ -663,7 +708,7 @@
       }
       var chip = e.target.closest('.tag-chip');
       if (chip) {
-        setFilter(chip.getAttribute('data-tag'), { reveal: true });
+        setFilter(chip.getAttribute('data-tag'), { reveal: true, keepStory: !!chip.closest('#story') });
         return;
       }
       if (e.target.closest('[data-home]')) {
@@ -679,6 +724,10 @@
 
     $('library-clear').addEventListener('click', function () { setFilter(null); });
 
+    $('library-tag-select').addEventListener('change', function (e) {
+      setFilter(e.target.value || null);
+    });
+
     $('clouds').addEventListener('animationend', function (e) {
       if (e.animationName === 'cloud-boing' || e.animationName === 'cloud-pulse') {
         e.target.classList.remove('is-boing', 'is-pulse');
@@ -690,8 +739,8 @@
       state.filterTag = u.tag && state.tagMap[u.tag] ? u.tag : (u.tag || null);
       renderLibrary();
       updateClouds();
-      var id = u.work && state.byId[u.work] ? u.work : (state.works[0] && state.works[0].id);
-      if (id && id !== state.currentId) { state.currentId = id; renderStory(); }
+      var id = u.work && state.byId[u.work] ? u.work : firstWorkId(state.filterTag);
+      if (id !== state.currentId || !id) { state.currentId = id; renderStory(); }
       updateCurrentMarks();
     });
 
@@ -780,6 +829,7 @@
       state.tags = tags;
       tags.forEach(function (t) { state.tagMap[t.name] = t; });
       renderClouds();
+      renderTagSelect();
       return loadFileList();
     }).then(loadWorks).then(function (works) {
       state.works = works;
@@ -791,9 +841,10 @@
         state.currentId = u.work;
       } else {
         if (u.work) notFound = u.work;
-        state.currentId = works[0] ? works[0].id : null;   // 初めて開いたときは最新の作品
       }
       state.filterTag = u.tag || null;
+      // 作品の指定がないときは、絞り込んだ一覧(タグなしなら全作品)のいちばん新しい作品
+      if (!state.currentId) state.currentId = firstWorkId(state.filterTag);
 
       renderStory({ notFound: notFound });
       renderLibrary();
