@@ -120,7 +120,16 @@
 
     <!-- ===== 右列:書庫 ===== -->
     <aside class="card library" id="library" aria-labelledby="library-h">
-      <h2 class="card-title" id="library-h"><span class="card-title__dot" aria-hidden="true"></span>書庫</h2>
+      <div class="library-head">
+        <h2 class="card-title" id="library-h"><span class="card-title__dot" aria-hidden="true"></span>書庫</h2>
+        <!-- タグで絞り込むプルダウン(選択肢は settings/tags.txt から自動で作られます) -->
+        <label class="tag-select">
+          <span class="visually-hidden">書庫をタグで絞り込む</span>
+          <select id="library-tag-select">
+            <option value="">全作品</option>
+          </select>
+        </label>
+      </div>
       <div class="library-filter" id="library-filter" hidden>
         <p class="library-filter__name" id="library-filter-name"></p>
         <p class="library-filter__desc" id="library-filter-desc"></p>
