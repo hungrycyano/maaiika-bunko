@@ -511,7 +511,7 @@
       b.className = 'cloud';
       b.setAttribute('data-tag', tag.name);
       b.setAttribute('aria-pressed', 'false');
-      b.title = tag.desc;
+      b.setAttribute('data-desc', tag.desc);   // マウスを置いたときの説明(setupCloudTip で表示)
       b.setAttribute('aria-label', tag.name + ':' + tag.desc);
 
       var scale = rand(0.9, 1.12);             // 大きさ
@@ -581,6 +581,64 @@
       b.appendChild(label);
       box.appendChild(b);
     });
+  }
+
+  // 雲にマウスを置いたときに出す説明。雲の色に合わせた枠で、画面の端からはみ出さない位置に出す
+  // (タッチ操作では出しません。読み上げには aria-label で同じ説明を伝えています)
+  function setupCloudTip() {
+    var tip = document.createElement('div');
+    tip.className = 'cloud-tip';
+    tip.setAttribute('aria-hidden', 'true');
+    tip.hidden = true;
+    document.body.appendChild(tip);
+    var timer = null;
+    var current = null;
+    var MARGIN = 8;    // 画面の端・雲からあける間
+
+    function place(cloud) {
+      var r = cloud.getBoundingClientRect();
+      var vw = document.documentElement.clientWidth;
+      var vh = document.documentElement.clientHeight;
+      var w = tip.offsetWidth, h = tip.offsetHeight;
+      var left = Math.min(Math.max(r.left + r.width / 2 - w / 2, MARGIN), vw - w - MARGIN);
+      var top = r.bottom + MARGIN;
+      if (top + h > vh - MARGIN) top = r.top - h - MARGIN;     // 下に入らないときは上に出す
+      top = Math.min(Math.max(top, MARGIN), vh - h - MARGIN);
+      tip.style.left = Math.max(left, MARGIN) + 'px';
+      tip.style.top = top + 'px';
+    }
+    function show(cloud) {
+      var desc = cloud.getAttribute('data-desc');
+      if (!desc) return;
+      current = cloud;
+      tip.textContent = desc;
+      tip.style.setProperty('--tip-tint', cloud.style.getPropertyValue('--tint') || 'var(--cloud-1)');
+      tip.hidden = false;
+      place(cloud);
+    }
+    function hide() {
+      clearTimeout(timer);
+      current = null;
+      tip.hidden = true;
+    }
+
+    var box = $('clouds');
+    box.addEventListener('pointerover', function (e) {
+      if (e.pointerType !== 'mouse') return;
+      var cloud = e.target.closest('.cloud');
+      if (!cloud || cloud === current) return;
+      clearTimeout(timer);
+      timer = setTimeout(function () { show(cloud); }, 350);
+    });
+    box.addEventListener('pointerout', function (e) {
+      var cloud = e.target.closest('.cloud');
+      if (cloud && cloud.contains(e.relatedTarget)) return;    // 雲の中で動いただけ
+      hide();
+    });
+    box.addEventListener('pointerdown', hide);
+    window.addEventListener('scroll', hide, true);
+    window.addEventListener('resize', hide);
+    window.addEventListener('blur', hide);
   }
 
   // 押したときに、雲を「ぽよん」とはずませる
@@ -817,6 +875,7 @@
   function start() {
     setupReader();
     bindEvents();
+    setupCloudTip();
 
     var tagsPromise = fetchText(CONFIG.tagsFile)
       .then(parseTags)
