@@ -10,7 +10,7 @@
 OrangeGreen in word world wonder
 OrangeGreen in word world wonder
 
-www www
+www
 
 3月生まれのオレンジグリーン
 
@@ -22,13 +22,16 @@ www www
 ランタンとなる
 
 
+
 隠された
 消えた
 すり減った
 ことのはを
 
+
 瞬時に蘇らせる
 黄泉の国の魔術師
+
 
 
 人は死に、作品だけが残る。
