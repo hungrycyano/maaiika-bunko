@@ -22,7 +22,8 @@
     '作者名': 'author',
     'タグ': 'tags',
     '内容': 'summary',
-    '公開日': 'date'
+    '公開日': 'date',
+    '空行': 'blankLines'
   };
 
   var FONT_SIZES = [14, 16, 18, 20, 22, 24, 27];
@@ -188,6 +189,7 @@
       summary: meta.summary || '',
       tags: [],
       date: '',
+      keepBlankLines: false,
       body: lines.slice(bodyStart).join('\n')
     };
 
@@ -226,6 +228,14 @@
       warn(where, '「公開日」がありません。並び順がいちばん後ろになります。');
     }
 
+    if (meta.blankLines) {
+      if (meta.blankLines.replace(/[ \t\u3000]/g, '') === 'そのまま') {
+        work.keepBlankLines = true;
+      } else {
+        warn(where, '「空行」の「' + meta.blankLines + '」は使えません。続けて空けた空行をそのまま表示したいときは「空行: そのまま」と書いてください。');
+      }
+    }
+
     if (!work.body.trim()) warn(where, '本文が空です。');
     return work;
   }
@@ -240,17 +250,28 @@
     return escaped;
   }
 
-  function renderBody(body) {
+  function renderBody(body, keepBlankLines) {
     // 編集画面などで紛れこむ空白の記号(&#x20; や &nbsp;)は、ふつうの空白として扱う
     body = body.replace(/&#x20;|&#32;|&nbsp;/gi, ' ');
     // 空行(スペースだけの行も含む)を段落の区切りにする
-    var paragraphs = body.replace(/^\s*\n/, '').split(/\n(?:[ \t　]*\n)+/);
-    return paragraphs.map(function (p) {
-      p = p.replace(/^\n+|\n+$/g, '');
-      if (!p.trim()) return '';
-      var html = p.split('\n').map(function (l) { return inlineFormat(escapeHtml(l)); }).join('<br>');
-      return '<p>' + html + '</p>';
-    }).join('\n');
+    // 「空行: そのまま」の作品では、空行が2行以上続いたところを、空行の数と同じ行数ぶんの空きにする
+    var parts = body.replace(/^\s*\n/, '').split(/(\n(?:[ \t　]*\n)+)/);
+    var html = [];
+    var extra = 0;
+    for (var i = 0; i < parts.length; i++) {
+      if (i % 2) {
+        if (keepBlankLines) extra += (parts[i].match(/\n/g) || []).length - 1;
+        continue;
+      }
+      var p = parts[i].replace(/^\n+|\n+$/g, '');
+      if (!p.trim()) continue;
+      if (extra >= 2 && html.length) {
+        html.push('<div class="blank-lines" style="--blank-lines: ' + extra + '" aria-hidden="true"></div>');
+      }
+      extra = 0;
+      html.push('<p>' + p.split('\n').map(function (l) { return inlineFormat(escapeHtml(l)); }).join('<br>') + '</p>');
+    }
+    return html.join('\n');
   }
 
   /* =========================================================
@@ -401,7 +422,7 @@
           (work.subtitle ? '<p class="story-subtitle">' + escapeHtml(work.subtitle) + '</p>' : '') +
           '<p class="story-meta">' + meta.join('') + '</p>' +
         '</header>' +
-        '<div class="story-body">' + renderBody(work.body) + '</div>' +
+        '<div class="story-body">' + renderBody(work.body, work.keepBlankLines) + '</div>' +
         '<nav class="story-nav" aria-label="前後の作品">' +
           (older
             ? '<a class="prev" href="' + workHref(older.id) + '" data-work="' + escapeHtml(older.id) + '"><small>← 前の作品</small>' + escapeHtml(older.title) + '</a>'

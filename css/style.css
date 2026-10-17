@@ -425,6 +425,9 @@ button { font: inherit; color: inherit; }
 .story-subtitle { margin: 0.2em 0 0; font-size: 1em; color: var(--text-muted); }
 .story-meta { margin: 0.6em 0 0; font-family: var(--font-ui); font-size: 0.78em; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
 .story-body p { margin: 0 0 1.2em; }
+/* 「空行: そのまま」の作品で、空行が2行以上続いたところの空き。
+   直前の段落の余白(1.2em)と合わせて「空行の数 × 1行の高さ(2.05em)」になる。縦書きでは横幅になる */
+.story-body .blank-lines { block-size: calc(var(--blank-lines, 2) * 2.05em - 1.2em); }
 .story-body rt { font-size: 0.5em; letter-spacing: 0; }
 
 .tag-chips { display: inline-flex; flex-wrap: wrap; gap: 6px; }
